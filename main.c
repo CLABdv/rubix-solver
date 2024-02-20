@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 void set_sane_defaults(uint8_t sn)
 {
     int max_speed;
@@ -32,7 +31,7 @@ int main()
     FLAGS_T state;
 
     printf("Initing robot\n");
-    if (ev3_init() != 1)
+    if (ev3_init() == -1)
     {
         exit(1);
     }
@@ -106,7 +105,7 @@ int main()
             get_tacho_state_flags(scanny_sn, &state);
             usleep(10000);
         } while (state & (~TACHO_RAMPING)); // ramping flag seems to be bugged
-        usleep(800000);
+        usleep(1200000);
         print_color(decider(col_shared, EDGE));
         usleep(500000);
 
@@ -133,7 +132,7 @@ int main()
             get_tacho_state_flags(scanny_sn, &state);
             usleep(10000);
         } while (state & (~TACHO_RAMPING));
-        usleep(800000);
+        usleep(1200000);
         print_color(decider(col_shared, CORNER));
         usleep(500000);
 
@@ -163,7 +162,7 @@ int main()
                 get_tacho_state_flags(scanny_sn, &state);
                 usleep(10000);
             } while (state & (~TACHO_RAMPING)); 
-            usleep(800000);
+            usleep(1200000);
             print_color(decider(col_shared, MIDDLE));
             usleep(500000);
 

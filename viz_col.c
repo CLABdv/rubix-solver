@@ -13,11 +13,35 @@ void *thread_wrap_show_col(void *_)
 
 void show_col()
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        printf("%s\n", SDL_GetError());
+    }
     SDL_Window *window =
         SDL_CreateWindow("colour viz", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_W, WIN_H, 0);
+    if(!window)
+    {
+        printf("%s\n", SDL_GetError());
+        SDL_Quit();
+        return;
+    }
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+    if(!renderer)
+    {
+        printf("%s\n", SDL_GetError());
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return;
+    }
     SDL_Texture *tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_STREAMING, WIN_H, WIN_W);
+    if(!tex)
+    {
+        printf("%s\n", SDL_GetError());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return;
+    }
 
     int *pix_tmp = NULL;
     int pitch = 4 * WIN_W;
@@ -39,8 +63,8 @@ void show_col()
         SDL_RenderCopy(renderer, tex, NULL, NULL);
         SDL_RenderPresent(renderer);
     }
-    SDL_DestroyRenderer(renderer);
     SDL_DestroyTexture(tex);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
