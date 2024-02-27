@@ -20,19 +20,22 @@ void vec_sub(const double *v1, const double *v2, double *buf)
         buf[i] = v1[i] - v2[i];
     }
 }
-const double col_vals[18][3] = {
 
+// same order as enum
+const double col_vals[18][3] = {
     CORNER_WHITE_VAL,  EDGE_WHITE_VAL,  MIDDLE_WHITE_VAL,
+
+    CORNER_BLUE_VAL,   EDGE_BLUE_VAL,   MIDDLE_BLUE_VAL,
+
+    CORNER_ORANGE_VAL, EDGE_ORANGE_VAL, MIDDLE_ORANGE_VAL,
 
     CORNER_YELLOW_VAL, EDGE_YELLOW_VAL, MIDDLE_YELLOW_VAL,
 
     CORNER_GREEN_VAL,  EDGE_GREEN_VAL,  MIDDLE_GREEN_VAL,
 
-    CORNER_BLUE_VAL,   EDGE_BLUE_VAL,   MIDDLE_BLUE_VAL,
-
     CORNER_RED_VAL,    EDGE_RED_VAL,    MIDDLE_RED_VAL,
 
-    CORNER_ORANGE_VAL, EDGE_ORANGE_VAL, MIDDLE_ORANGE_VAL};
+};
 
 enum colour_t converter(enum colour_pos_t col_pos)
 {
@@ -65,7 +68,23 @@ enum colour_t converter(enum colour_pos_t col_pos)
     }
 }
 
-enum colour_t decider(uint_fast32_t col, enum pos_t pos)
+void print_pos(enum pos_t pos)
+{
+    switch (pos)
+    {
+    case 0:
+        printf("corner");
+        break;
+    case 1:
+        printf("edge");
+        break;
+    case 2:
+        printf("middle");
+        break;
+    }
+}
+
+enum colour_t decider(uint_fast32_t col, enum pos_t pos, FILE *log_file)
 {
     double v[3];
     for (int i = 0; i < 3; i++)
@@ -77,7 +96,6 @@ enum colour_t decider(uint_fast32_t col, enum pos_t pos)
     {
         v[i] /= vlen;
     }
-    printf("normalised col is [%lf, %lf, %lf], and veclen is %lf\n", v[0], v[1], v[2], vlen);
     double current_min_dist = INFINITY;
     enum colour_pos_t current_col = 0;
     for (int i = 0; i < 6; i++)
@@ -92,37 +110,41 @@ enum colour_t decider(uint_fast32_t col, enum pos_t pos)
         }
     }
     enum colour_t c = converter(current_col);
-    // fixes some mess-ups which seem to require more info than the direction
-    // i think this makes it somewhat more accurate
-    if(c == RED && vlen > 215)
-        return ORANGE;
-    if(c == ORANGE && vlen < 190)
-        return RED;
-    if(c == WHITE && vlen < 230)
-        return BLUE;
+    if (vlen < 170 && c == WHITE)
+        c = BLUE;
+
+    printf("[%lf, %lf, %lf], %lf, ", v[0], v[1], v[2], vlen);
+    print_pos(pos);
+    printf(", ");
+    fprint_color(stdout, c);
+    if (log_file != NULL)
+    {
+        fprintf(log_file, "[%lf, %lf, %lf], %lf, %d, ", v[0], v[1], v[2], vlen, pos);
+        fprint_color(log_file, c);
+    }
     return c;
 }
-void print_color(enum colour_t col_id)
+void fprint_color(FILE *file, enum colour_t col_id)
 {
     switch (col_id)
     {
     case WHITE:
-        printf("white\n");
+        fprintf(file, "white\n");
         break;
     case YELLOW:
-        printf("yellow\n");
+        fprintf(file, "yellow\n");
         break;
     case GREEN:
-        printf("green\n");
+        fprintf(file, "green\n");
         break;
     case BLUE:
-        printf("blue\n");
+        fprintf(file, "blue\n");
         break;
     case RED:
-        printf("red\n");
+        fprintf(file, "red\n");
         break;
     case ORANGE:
-        printf("orange\n");
+        fprintf(file, "orange\n");
         break;
     }
 }

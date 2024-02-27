@@ -1,15 +1,16 @@
 #ifndef COL_DECIDER_H
 #define COL_DECIDER_H
 #include <stdint.h>
+#include <stdio.h>
 
 enum colour_t
 {
     WHITE,
+    BLUE,
+    ORANGE,
     YELLOW,
     GREEN,
-    BLUE,
     RED,
-    ORANGE
 };
 
 enum pos_t
@@ -25,6 +26,14 @@ enum colour_pos_t
     EDGE_WHITE,
     MIDDLE_WHITE,
 
+    CORNER_BLUE,
+    EDGE_BLUE,
+    MIDDLE_BLUE,
+
+    CORNER_ORANGE,
+    EDGE_ORANGE,
+    MIDDLE_ORANGE,
+
     CORNER_YELLOW,
     EDGE_YELLOW,
     MIDDLE_YELLOW,
@@ -33,21 +42,13 @@ enum colour_pos_t
     EDGE_GREEN,
     MIDDLE_GREEN,
 
-    CORNER_BLUE,
-    EDGE_BLUE,
-    MIDDLE_BLUE,
-
     CORNER_RED,
     EDGE_RED,
     MIDDLE_RED,
-
-    CORNER_ORANGE,
-    EDGE_ORANGE,
-    MIDDLE_ORANGE
 };
 
-enum colour_t decider(uint_fast32_t, enum pos_t);
-void print_color(enum colour_t);
+enum colour_t decider(uint_fast32_t, enum pos_t, FILE *log_file);
+void fprint_color(FILE *file, enum colour_t);
 // red and orange are corner vals,
 // rest doesnt matter because theyre different enough
 
@@ -67,11 +68,11 @@ void print_color(enum colour_t);
 #define EDGE_BLUE_VAL {0.369681, 0.588751, 0.718824}
 #define MIDDLE_BLUE_VAL {0.302436, 0.557826, 0.772892}
 
-#define CORNER_RED_VAL {0.942839, 0.259143, 0.209520}
-#define EDGE_RED_VAL {0.950217, 0.233482, 0.206333}
+#define CORNER_RED_VAL {0.956575, 0.206113, 0.206113}
+#define EDGE_RED_VAL {0.946241, 0.242062, 0.214555}
 #define MIDDLE_RED_VAL {0.960474, 0.194194, 0.199443}
 
-#define CORNER_ORANGE_VAL {0.854159, 0.417693, 0.309750}
+#define CORNER_ORANGE_VAL {0.922328, 0.314677, 0.224252}
 #define EDGE_ORANGE_VAL {0.939609, 0.283015, 0.192450}
 #define MIDDLE_ORANGE_VAL {0.909572, 0.342427, 0.235419}
 
