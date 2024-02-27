@@ -1,3 +1,3 @@
-just a school project
+school project
 
-fairly scuffed
+solves rubix cube
