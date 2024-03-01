@@ -1,4 +1,4 @@
-#!/usr/bin/python3.12
+#!/usr/bin/python3.11
 import matplotlib.pyplot as plt
 
 def parse_file_line(line):
@@ -28,7 +28,10 @@ for line in read_data:
         m = "X"
     elif line[2] == 2: #middle
         m = "*"
-    ax.scatter(xs, ys, zs, c = line[1], marker=m)
+    col = line[1]
+    if col == "orange":
+        col = "black"
+    ax.scatter(xs, ys, zs, c = col, marker=m)
 
 ax.set_xlabel('Red')
 ax.set_ylabel('Green')

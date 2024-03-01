@@ -1,3 +1,4 @@
+#include "actions.h"
 #include "ev3.h"
 #include "ev3_port.h"
 #include "ev3_tacho.h"
@@ -14,6 +15,9 @@
 void set_sane_defaults(uint8_t sn)
 {
     int max_speed;
+    //set_tacho_command_inx(sn, TACHO_RESET);
+    //set_tacho_position(sn, 0);
+    //set_tacho_position_sp(sn, 0);
     get_tacho_max_speed(sn, &max_speed);
     set_tacho_speed_sp(sn, max_speed / 5);
     set_tacho_ramp_up_sp(sn, 1000);
@@ -61,6 +65,7 @@ int main()
     set_sane_defaults(spinny_sn);
     set_sane_defaults(flippy_sn);
     set_sane_defaults(scanny_sn);
+    usleep(1000000);
 
     FLAGS_T state;
     int spinny_pos, flippy_pos, scanny_pos;
@@ -77,6 +82,10 @@ int main()
     pthread_create(&data_handler, NULL, &thread_wrap_com, NULL);
     pthread_create(&window_handler, NULL, &thread_wrap_show_col, NULL);
 
+    //while(keep_running)
+    //{
+    //    flip(scanny_sn, flippy_sn);
+    //}
     scan(scanny_sn, spinny_sn, flippy_sn);
 
     set_tacho_position_sp(scanny_sn, 0);

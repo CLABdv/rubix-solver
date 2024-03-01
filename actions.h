@@ -9,7 +9,7 @@ void rot_counter_90(uint8_t spinny_sn);
 void negate_polarity(uint8_t sn);
 #define EDGE_POS -143
 #define MIDDLE_POS -164
-#define CORNER_POS -142
+#define CORNER_POS -138
 #define FLIP_POSITION 130
 
 #endif

@@ -110,8 +110,13 @@ enum colour_t decider(uint_fast32_t col, enum pos_t pos, FILE *log_file)
         }
     }
     enum colour_t c = converter(current_col);
-    if (vlen < 170 && c == WHITE)
-        c = BLUE;
+    // correction for "orange" (black) and white, since both are grayscale
+    if (vlen < 158 && c == WHITE)
+        c = ORANGE;
+    if (vlen < 158 && c == YELLOW)
+        c = ORANGE;
+    if (vlen > 200 && c == ORANGE)
+        c = WHITE;
 
     printf("[%lf, %lf, %lf], %lf, ", v[0], v[1], v[2], vlen);
     print_pos(pos);

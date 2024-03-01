@@ -32,7 +32,7 @@ struct move_scan_args
 {
     uint8_t scanny_sn;
     uint8_t spinny_sn;
-    char *sing_buf;
+    char *buf;
     int pos_type;
 };
 
@@ -44,7 +44,6 @@ void move_scan(struct move_scan_args *msa, int i)
         return;
     uint8_t scanny_sn = msa->scanny_sn;
     uint8_t spinny_sn = msa->spinny_sn;
-    char *sing_buf = msa->sing_buf;
     int pos_type = msa->pos_type;
     int pos_pos;
     FLAGS_T state;
@@ -60,7 +59,7 @@ void move_scan(struct move_scan_args *msa, int i)
         usleep(10000);
     } while (state & (~TACHO_RAMPING)); // ramping flag is bugged or i dont know how to use it
     usleep(1200000);
-    sing_buf[i] = enum_to_char(decider(col_shared, pos_type, log_file));
+    msa->buf[i] = enum_to_char(decider(col_shared, pos_type, log_file));
     set_tacho_position_sp(spinny_sn, 45);
     set_tacho_command_inx(spinny_sn, TACHO_RUN_TO_REL_POS);
     do
@@ -70,94 +69,61 @@ void move_scan(struct move_scan_args *msa, int i)
     } while (state & (~TACHO_RAMPING));
 }
 
-// horror
-// abomination
-// disgust
+void scan_face(struct move_scan_args msa, int *order, int offset) //order is length 8
+{
+    struct move_scan_args msa_edge = msa;
+    msa_edge.pos_type=EDGE;
+    struct move_scan_args msa_corner = msa;
+    msa_corner.pos_type=CORNER;
+    for (int i=0; i<4; i++)
+    {
+        move_scan(&msa_edge, order[2 * i] + offset);
+        move_scan(&msa_corner, order[2 * i + 1] + offset);
+    }
+}
+
 void scan(uint8_t scanny_sn, uint8_t spinny_sn, uint8_t flippy_sn)
 {
-
     log_file = fopen("log.data", "a");
-    // singmaster notation, see cube20.org/cubepos.pdf
-    char sing_solved[] = "UF UR UB UL DF DR DB DL FR FL BR BL UFR URB UBL ULF DRF DFL DLB DBR";
-    char sing_buf[] = "XX XX XX XX XX XX XX XX XX XX XX XX XXX XXX XXX XXX XXX XXX XXX XXX";
-    // i miss currying
-    struct move_scan_args msa_edge = {scanny_sn, spinny_sn, sing_buf, EDGE};
-    struct move_scan_args msa_corner = {scanny_sn, spinny_sn, sing_buf, CORNER};
-
+    // refer to https://github.com/efrantar/rob-twophase/blob/master/src/face.h for format
+    char buf[]="UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"; // solved string
+    int order[8]={1,2,5,8,7,6,3,0};
+    struct move_scan_args msa = {scanny_sn, spinny_sn, buf}; // pos_type is undeclared, it is set inside scan_face
+    // scanning in this order because then i wont need to change the order
+    // the facelets are scanned (i wont need to change the "order" variable)
+    
     // top
-    move_scan(&msa_edge, 6);
-    move_scan(&msa_corner, 40);
-    move_scan(&msa_edge, 3);
-    move_scan(&msa_corner, 36);
-    move_scan(&msa_edge, 0);
-    move_scan(&msa_corner, 48);
-    move_scan(&msa_edge, 9);
-    move_scan(&msa_corner, 44);
-
-    flip(scanny_sn, flippy_sn);
-
-    // right
-    move_scan(&msa_edge, 31);
-    move_scan(&msa_corner, 66);
-    move_scan(&msa_edge, 16);
-    move_scan(&msa_corner, 53);
-    move_scan(&msa_edge, 25);
-    move_scan(&msa_corner, 38);
-    move_scan(&msa_edge, 4);
-    move_scan(&msa_corner, 41);
-
-    flip(scanny_sn, flippy_sn);
-
-    // down
-    move_scan(&msa_edge, 18);
-    move_scan(&msa_corner, 60);
-    move_scan(&msa_edge, 21);
-    move_scan(&msa_corner, 56);
-    move_scan(&msa_edge, 12);
-    move_scan(&msa_corner, 52);
-    move_scan(&msa_edge, 15);
-    move_scan(&msa_corner, 64);
-
-    rot_counter_90(spinny_sn);
-    flip(scanny_sn, flippy_sn);
-
-    // behind
-    move_scan(&msa_edge, 30);   // BR
-    move_scan(&msa_corner, 42); // URB
-    move_scan(&msa_edge, 7);    // UB
-    move_scan(&msa_corner, 45); // UBL
-    move_scan(&msa_edge, 33);   // BL
-    move_scan(&msa_corner, 62); // DLB
-    move_scan(&msa_edge, 19);   // DB
-    move_scan(&msa_corner, 65); // DBR
+    scan_face(msa, order, 0);
 
     rot_90(spinny_sn);
     flip(scanny_sn, flippy_sn);
+    rot_counter_90(spinny_sn);
 
-    // left
-    move_scan(&msa_edge, 10);   // UL
-    move_scan(&msa_corner, 49); // ULF
-    move_scan(&msa_edge, 28);   // FL
-    move_scan(&msa_corner, 58); // DFL
-    move_scan(&msa_edge, 22);   // DL
-    move_scan(&msa_corner, 61); // DLB
-    move_scan(&msa_edge, 34);   // BL
-    move_scan(&msa_corner, 46); // UBL
+    // front
+    scan_face(msa, order, 18);
 
     flip(scanny_sn, flippy_sn);
 
-    // front
-    move_scan(&msa_edge, 1);   // UF
-    move_scan(&msa_corner, 50); // ULF
-    move_scan(&msa_edge, 27);   // FL
-    move_scan(&msa_corner, 57); // DFL
-    move_scan(&msa_edge, 13);   // DF
-    move_scan(&msa_corner, 54); // DRF
-    move_scan(&msa_edge, 24);   // FR
-    move_scan(&msa_corner, 37); // UFR
+    //right
+    scan_face(msa, order, 9);
 
-    printf("sing solved is %s\n"
-           "sing scanned is %s\n",
-           sing_solved, sing_buf);
+    flip(scanny_sn, flippy_sn);
+
+    // behind
+    scan_face(msa, order, 45);
+
+    flip(scanny_sn, flippy_sn);
+
+    // left
+    scan_face(msa, order, 36);
+    
+    rot_90(spinny_sn);
+    flip(scanny_sn, flippy_sn);
+    rot_counter_90(spinny_sn);
+    
+    //down
+    scan_face(msa, order, 27);
+
+    printf("%s\n", buf);
     fclose(log_file);
 }
