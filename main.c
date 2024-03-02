@@ -50,7 +50,7 @@ int main(int argc, char **argv)
         usage: // maybe wrap in a function instead of goto, but then you need to pass argv[0]
             fprintf(stderr,
                     "Usage: %s [-t <solution string>] to solve a cube XOR %s [-s] to scan cube.\n"
-                    "Spinner needs to be port B, flipper port C and scanner is port D.\n",
+                    "Spinner needs to be port B, flipper port C and scanner port D.\n",
                     argv[0], argv[0]);
             exit(1);
         }
