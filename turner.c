@@ -129,9 +129,6 @@ void navigate_to(uint8_t scanny_sn, uint8_t flippy_sn, uint8_t spinny_sn, enum f
     int turns = (current_index - dest_index) % 4;
     if (turns < 0)
         turns += 4;
-#ifdef DEBUG
-    printf("turns is %d\n", turns);
-#endif
     switch (turns)
     {
     case 0:
