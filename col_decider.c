@@ -3,17 +3,17 @@
 #include <stdint.h>
 #include <stdio.h>
 
-double vec_len_sq(double *v)
+static double vec_len_sq(double *v)
 {
     return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
 }
 
-double vec_len(double *v)
+static double vec_len(double *v)
 {
     return sqrt(vec_len_sq(v));
 }
 
-void vec_sub(const double *v1, const double *v2, double *buf)
+static void vec_sub(const double *v1, const double *v2, double *buf)
 {
     for (int i = 0; i < 3; i++)
     {
@@ -22,7 +22,7 @@ void vec_sub(const double *v1, const double *v2, double *buf)
 }
 
 // same order as enum
-const double col_vals[18][3] = {
+static const double col_vals[18][3] = {
     CORNER_WHITE_VAL,  EDGE_WHITE_VAL,  MIDDLE_WHITE_VAL,
 
     CORNER_BLUE_VAL,   EDGE_BLUE_VAL,   MIDDLE_BLUE_VAL,
@@ -37,7 +37,7 @@ const double col_vals[18][3] = {
 
 };
 
-enum colour_t converter(enum colour_pos_t col_pos)
+static enum colour_t converter(enum colour_pos_t col_pos)
 {
     switch (col_pos)
     {
@@ -66,6 +66,7 @@ enum colour_t converter(enum colour_pos_t col_pos)
     case MIDDLE_ORANGE:
         return ORANGE;
     }
+    return -1;
 }
 
 void print_pos(enum pos_t pos)
@@ -110,13 +111,6 @@ enum colour_t decider(uint_fast32_t col, enum pos_t pos, FILE *log_file)
         }
     }
     enum colour_t c = converter(current_col);
-    // correction for "orange" (black) and white, since both are grayscale
-    if (vlen < 158 && c == WHITE)
-        c = ORANGE;
-    if (vlen < 158 && c == YELLOW)
-        c = ORANGE;
-    if (vlen > 200 && c == ORANGE)
-        c = WHITE;
 
     printf("[%lf, %lf, %lf], %lf, ", v[0], v[1], v[2], vlen);
     print_pos(pos);

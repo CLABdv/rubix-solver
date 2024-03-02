@@ -47,8 +47,13 @@ enum colour_pos_t
     MIDDLE_RED,
 };
 
+#define EDGE_POS -139
+#define MIDDLE_POS -156
+#define CORNER_POS -139
+
 enum colour_t decider(uint_fast32_t, enum pos_t, FILE *log_file);
 void fprint_color(FILE *file, enum colour_t);
+void print_pos(enum pos_t pos);
 // red and orange are corner vals,
 // rest doesnt matter because theyre different enough
 
@@ -72,10 +77,8 @@ void fprint_color(FILE *file, enum colour_t);
 #define EDGE_RED_VAL {0.801148, 0.417500, 0.428784}
 #define MIDDLE_RED_VAL {0.960474, 0.194194, 0.199443}
 
-// note that the values that are labeled orange really are black
-// black is the new orange!?!?!
-#define CORNER_ORANGE_VAL {0.621287, 0.568536, 0.539230}
-#define EDGE_ORANGE_VAL {0.615008, 0.578473, 0.535849}
+#define CORNER_ORANGE_VAL {0.954101, 0.247360, 0.168833}
+#define EDGE_ORANGE_VAL {0.951700, 0.254849, 0.171226}
 #define MIDDLE_ORANGE_VAL {0.909572, 0.342427, 0.235419}
 
 #endif
