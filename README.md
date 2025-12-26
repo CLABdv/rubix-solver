@@ -9,6 +9,6 @@ Note that the colour sensor which was had in hand did not work properly, this is
 
 # The machine in action
 <video width="640" controls>
-  <source src="pictures/rubix..mp4" type="video/mp4">
+  <source src="pictures/rubix.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
